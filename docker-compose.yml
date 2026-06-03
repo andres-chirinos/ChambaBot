@@ -9,6 +9,5 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    # Descomenta la siguiente línea y añade volúmenes si deseas que los cambios en el código se reflejen sin reconstruir la imagen
-    # volumes:
-    #   - ./index.py:/app/index.py
+    volumes:
+      - ./data:/app/data

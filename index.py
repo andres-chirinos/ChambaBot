@@ -26,6 +26,21 @@ bot = commands.Bot(command_prefix=prefijo, intents=intents)
 
 
 def actualizar_datos():
+    if drive_url:
+        try:
+            print("Descargando datos desde Google Drive...")
+            response = requests.get(drive_url)
+            if response.status_code == 200:
+                # Asegurarse de que el directorio data exista
+                os.makedirs('data', exist_ok=True)
+                with open('data/apodos.csv', 'wb') as f:
+                    f.write(response.content)
+                print("Archivo data/apodos.csv actualizado desde Drive.")
+            else:
+                print(f"Error al descargar desde Drive: {response.status_code}")
+        except Exception as e:
+            print(f"Error en la petición a Drive: {e}")
+
     user_data = defaultdict(list)
     try:
         with open('data/apodos.csv', mode='r', encoding='utf-8') as f:
@@ -40,7 +55,7 @@ def actualizar_datos():
                 except ValueError:
                     print(f"Error al procesar la fila: {row}")
                     continue
-        print("Datos actualizados:", user_data)
+        print("Datos cargados exitosamente.")
         return user_data
     except Exception as e:
         print(f"Error al leer el archivo data/apodos.csv: {e}")
