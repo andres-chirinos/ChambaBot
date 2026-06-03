@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
 COPY index.py .
+COPY data/ data/
 
 # Run the bot
 CMD ["python", "index.py"]

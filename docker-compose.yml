@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  chambabot:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: chambabot
+    restart: unless-stopped
+    env_file:
+      - .env
+    # Descomenta la siguiente línea y añade volúmenes si deseas que los cambios en el código se reflejen sin reconstruir la imagen
+    # volumes:
+    #   - ./index.py:/app/index.py

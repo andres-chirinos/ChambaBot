@@ -26,37 +26,42 @@ bot = commands.Bot(command_prefix=prefijo, intents=intents)
 
 
 def actualizar_datos():
-    response = requests.get(drive_url)
-    if response.status_code == 200:
-        file_content = io.StringIO(response.content.decode('utf-8'))
-        reader = csv.reader(file_content)
-        user_data = defaultdict(list)
-        next(reader)  # Saltar la primera fila si contiene encabezados
-        for row in reader:
-          try:
-            user_data[int(row[2].strip())].append(row[3].strip())
-          except ValueError:
-            print(f"Error al procesar la fila: {row}")
-            continue
+    user_data = defaultdict(list)
+    try:
+        with open('data/apodos.csv', mode='r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                try:
+                    user_id = row.get('id', '')
+                    apodo = row.get('apodo', '')
+                    if not user_id or not apodo:
+                        continue
+                    user_data[int(user_id.strip())].append(apodo.strip())
+                except ValueError:
+                    print(f"Error al procesar la fila: {row}")
+                    continue
         print("Datos actualizados:", user_data)
         return user_data
-    else:
-        print(f"Error al descargar el archivo: {response.status_code}")
+    except Exception as e:
+        print(f"Error al leer el archivo data/apodos.csv: {e}")
         return None
 
 user_data = actualizar_datos()
 
 def buscar_nick(user_id, anterior:str=None):
-    try:
-        while True:
-              res = random.choice(user_data[user_id])
-              if res != anterior:
-                  break
-        print(f"Nuevo apodo seleccionado para {user_id}: {res}")
-        return res
-    except KeyError:
+    nicks = user_data.get(user_id)
+    if not nicks:
         print(f"No se encontró un apodo para el usuario con ID {user_id}")
         return None
+        
+    opciones = [n for n in nicks if n != anterior]
+    if not opciones:
+        # Si la única opción es el apodo actual, devolvemos el actual o None
+        return anterior
+        
+    res = random.choice(opciones)
+    print(f"Nuevo apodo seleccionado para {user_id}: {res}")
+    return res
 
 @bot.event
 async def on_ready():
